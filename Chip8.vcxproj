@@ -129,9 +129,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="chip8.cpp" />
-    <ClCompile Include="chip8.h" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\chip8.cpp" />
+    <ClCompile Include="src\chip8.h" />
+    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

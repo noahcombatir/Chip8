@@ -21,6 +21,16 @@ unsigned char chip8_fontset[80] =
   0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
+chip8::chip8()
+{
+	
+}
+
+chip8::~chip8()
+{
+	
+}
+
 void chip8::init() {
 	pc = 0x200; // program counter starts at 0x200
 	opcode = 0; // reset current opcode
@@ -526,9 +536,16 @@ void chip8::loadGame(char* filepath) {
 	// reads ROM file and stores in memory
 	size_t result = fread(rom_buffer, sizeof(char), (size_t) rom_size, rom);
 
-	for (int i = 0; i < rom_size; i++)
+	if (rom_size < 4096 - 512)
 	{
-		memory[i + 512] = (uint8_t) rom_buffer[i];
+		for (int i = 0; i < rom_size; i++)
+		{
+			memory[i + 512] = (uint8_t)rom_buffer[i];
+		}
+	}
+	else
+	{
+		std::cout << "ERROR: Rom too big for memory" << std::endl;
 	}
 
 	// clean up

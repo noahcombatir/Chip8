@@ -1,0 +1,3 @@
+﻿  chip8.cpp
+C:\Users\comba\source\repos\Chip8\Chip8\chip8.cpp(310,16): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
+  Chip8.vcxproj -> C:\Users\comba\source\repos\Chip8\x64\Debug\Chip8.exe
