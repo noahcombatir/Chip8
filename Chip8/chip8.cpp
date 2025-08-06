@@ -486,9 +486,17 @@ void chip8::emulateCycle() {
 
 void chip8::loadGame(char* filepath) {
 	// open ROM file
-	FILE* rom = fopen(filepath, "r");
+	FILE* rom;
+	errno_t err;
 
-	if (rom == NULL) {
+	if ((err = fopen_s(&rom, filepath, "r")) != 0)
+	{
+		std::cout << "ERROR! Cannot open file " << filepath << std::endl;
+		return;
+	}
+
+	if (rom == NULL)
+	{
 		printf("ERROR: file could not be opened.");
 		return;
 	}
@@ -497,17 +505,20 @@ void chip8::loadGame(char* filepath) {
 	struct stat file_info;
 	long rom_size;
 
-	if (stat(filepath, &file_info) == 0) {
+	if (stat(filepath, &file_info) == 0)
+	{
 		rom_size = file_info.st_size;
 	}
-	else {
+	else
+	{
 		std::cerr << "ERROR: File does not exist" << std::endl;
 	}
 
 	// allocates memory to store ROM
 	char* rom_buffer = (char*) malloc(sizeof(char) * rom_size);
 
-	if (rom_buffer == NULL) {
+	if (rom_buffer == NULL)
+	{
 		std::cerr << "ERROR: Failed to read ROM" << std::endl;
 		return;
 	}
@@ -515,7 +526,8 @@ void chip8::loadGame(char* filepath) {
 	// reads ROM file and stores in memory
 	size_t result = fread(rom_buffer, sizeof(char), (size_t) rom_size, rom);
 
-	for (int i = 0; i < rom_size; i++) {
+	for (int i = 0; i < rom_size; i++)
+	{
 		memory[i + 512] = (uint8_t) rom_buffer[i];
 	}
 
