@@ -3,9 +3,14 @@
 class chip8
 {
 	public:
-		void initialize();
+		chip8();
+		~chip8();
+
+		bool drawFlag;
+
+		void init();
 		void emulateCycle();
-		void loadGame(char* game);
+		void loadGame(char* filepath);
 		void setKeys();
 
 	private:

@@ -18,10 +18,10 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="chip8.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="chip8.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="chip8.h">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
