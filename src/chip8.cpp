@@ -1,7 +1,7 @@
-#include "chip8.h"
+#include "Chip8.h"
 #include <iostream>
 
-unsigned char chip8_fontset[80] =
+unsigned char Chip8_fontset[80] =
 {
   0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
   0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -21,17 +21,17 @@ unsigned char chip8_fontset[80] =
   0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-chip8::chip8()
+Chip8::Chip8()
 {
 	
 }
 
-chip8::~chip8()
+Chip8::~Chip8()
 {
 	
 }
 
-void chip8::init() {
+void Chip8::init() {
 	pc = 0x200; // program counter starts at 0x200
 	opcode = 0; // reset current opcode
 	I = 0; // reset index register
@@ -60,7 +60,7 @@ void chip8::init() {
 	// load fontset
 	for (int i = 0; i < 80; i++) 
 	{
-		memory[i] = chip8_fontset[i];
+		memory[i] = Chip8_fontset[i];
 	}
 
 	// reset timers
@@ -69,11 +69,15 @@ void chip8::init() {
 
 	// set drawFlag
 	drawFlag = true;
+
+	srand(time(NULL));
 }
 
-void chip8::emulateCycle() {
+void Chip8::emulateCycle() {
 	// fetch opcode
 	opcode = memory[pc] << 8 | memory[pc + 1];
+
+	std::cout << "PC: " << std::hex << pc << " OPCODE: " << std::hex << opcode << std::endl;
 
 	// decode opcode
 	switch (opcode & 0xF000)
@@ -150,7 +154,7 @@ void chip8::emulateCycle() {
 
 		case 0x5000: // 5XY0: skip the following instruction if VX is equal to the register of VY
 		{
-			if (V[(opcode & 0x0F00) >> 8] != V[(opcode & 0x00F0) >> 4])
+			if (V[(opcode & 0x0F00) >> 8] == V[(opcode & 0x00F0) >> 4])
 			{
 				pc += 4;
 			}
@@ -179,6 +183,13 @@ void chip8::emulateCycle() {
 		{
 			switch (opcode & 0x000F)
 			{
+				case 0x0000: // 8XY0: store value of VY in VX
+				{
+					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4];
+					pc += 2;
+				}
+				break;
+
 				case 0x0001: // 8XY1: bitwise OR
 				{
 					V[(opcode & 0x0F00) >> 8] |= V[(opcode & 0x00F0) >> 4];
@@ -259,7 +270,7 @@ void chip8::emulateCycle() {
 				case 0x000E: // 8XYE: store VY << 1 in VX, set VF to MOST significant bit
 				{
 					V[0xF] = V[(opcode & 0x00F0) >> 4] >> 7;
-					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) > 4] << 1;
+					V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4] << 1;
 					pc += 2;
 				}
 				break;
@@ -303,8 +314,8 @@ void chip8::emulateCycle() {
 		case 0xD000: // DXYN: draw a sprite at (VX, VY) with a width of 8 and height of N bytes of data starting
 		{			//  at address in I set VF to 1 if any pixels are changed to unset, and 00 otherwise
 			// position and height of sprite
-			unsigned short x = V[(opcode & 0x0F00) >> 8];
-			unsigned short y = V[(opcode & 0x00F0) >> 4];
+			unsigned short x = V[(opcode & 0x0F00) >> 8] % 64;
+			unsigned short y = V[(opcode & 0x00F0) >> 4] % 32;
 			unsigned short height = opcode & 0x000F;
 
 			unsigned short pixel;
@@ -317,7 +328,7 @@ void chip8::emulateCycle() {
 				for (int j = 0; j < 8; j++)
 				{
 					// checks if current pixel is 1 (scans through byte one bit at a time)
-					if (pixel & (0x80 >> j) != 0)
+					if ((pixel & (0x80 >> j)) != 0)
 					{
 						// checks if pixel on display is set to 1
 						if (gfx[x + j + ((y + i) * 64)] == 1)
@@ -444,14 +455,14 @@ void chip8::emulateCycle() {
 				{
 					memory[I] = V[(opcode & 0x0F00) >> 8] / 100;
 					memory[I + 1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
-					memory[I + 2] = (V[(opcode & 0x0F00) >> 8] / 100) % 10;
+					memory[I + 2] = (V[(opcode & 0x0F00) >> 8] % 100) % 10;
 					pc += 2;
 				}
 				break;
 
 				case 0x0055: // FX55: stores values of registers V0 to VX in memory starting at address I
 				{
-					unsigned short x = V[(opcode & 0x0F00) >> 8];
+					unsigned short x = (opcode & 0x0F00) >> 8;
 
 					for (int i = 0; i <= x; i++)
 					{
@@ -465,14 +476,14 @@ void chip8::emulateCycle() {
 
 				case 0x0065: // FX65: fills registers V0 to VX with the values stored in memory at address I
 				{
-					unsigned short vx = V[(opcode & 0x0F00) >> 8];
+					unsigned short x = (opcode & 0x0F00) >> 8;
 
-					for (int i = 0; i <= vx; i++)
+					for (int i = 0; i <= x; i++)
 					{
 						V[i] = memory[I + i];
 					}
 
-					I += vx + 1;
+					I += x + 1;
 					pc += 2;
 				}
 				break;
@@ -487,19 +498,19 @@ void chip8::emulateCycle() {
 	}
 
 	if (sound_timer > 0) {
-		if (sound_timer = 1) {
+		if (sound_timer == 1) {
 			printf("BEEP!\n");
 		}
 		--sound_timer;
 	}
 }
 
-void chip8::loadGame(char* filepath) {
+void Chip8::loadGame(const char* filepath) {
 	// open ROM file
 	FILE* rom;
 	errno_t err;
 
-	if ((err = fopen_s(&rom, filepath, "r")) != 0)
+	if ((err = fopen_s(&rom, filepath, "rb")) != 0)
 	{
 		std::cout << "ERROR! Cannot open file " << filepath << std::endl;
 		return;
@@ -536,11 +547,11 @@ void chip8::loadGame(char* filepath) {
 	// reads ROM file and stores in memory
 	size_t result = fread(rom_buffer, sizeof(char), (size_t) rom_size, rom);
 
-	if (rom_size < 4096 - 512)
+	if (rom_size <= 4096 - 512)
 	{
 		for (int i = 0; i < rom_size; i++)
 		{
-			memory[i + 512] = (uint8_t)rom_buffer[i];
+			memory[i + 512] = (uint8_t) rom_buffer[i];
 		}
 	}
 	else
@@ -548,11 +559,9 @@ void chip8::loadGame(char* filepath) {
 		std::cout << "ERROR: Rom too big for memory" << std::endl;
 	}
 
+	std::cout << "File: " << filepath << " successfully read!" << std::endl;
+
 	// clean up
 	fclose(rom);
 	free(rom_buffer);
-}
-
-void chip8::setKeys() {
-
 }

@@ -18,10 +18,10 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\chip8.cpp">
+    <ClCompile Include="src\Chip8.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\chip8.h">
+    <ClCompile Include="src\Chip8.h">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
