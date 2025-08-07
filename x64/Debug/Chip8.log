@@ -1,7 +1,0 @@
-﻿  Application.cpp
-  Chip8.cpp
-C:\Users\comba\source\repos\Chip8\Chip8\src\Chip8.cpp(73,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-  Chip8.h
-  main.cpp
-  Generating Code...
-  Chip8.vcxproj -> C:\Users\comba\source\repos\Chip8\x64\Debug\Chip8.exe
